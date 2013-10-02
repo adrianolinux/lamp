@@ -1,9 +1,5 @@
 function [Y,Z] = force(X,iter)
 
-% euclidiana
-global xx;
-xx = X;
-
 N = size(X,1);
 
 %-----------------------------%
@@ -14,7 +10,7 @@ N = size(X,1);
 % original
 Y = zeros(N,2);
 Y(1,:) = [0 0];
-Y(2,:) = [dist(1,2) 0];
+Y(2,:) = [dist(X,1,2) 0];
 
 num_projected_pts = 2;
 
@@ -30,8 +26,8 @@ for i = num_projected_pts+1:size(X,1)
   q = X(idx(2),:);
   % calcula a intersecao entre o circulo de centro p' = Y(idx(1),:) e
   % raio d(x,p) e o circulo de centro q' = Y(idx(2),:) e raio d(x,q)
-  r1 = dist(i,idx(1)); %r1 = dist(x,p);
-  r2 = dist(i,idx(2)); %r2 = dist(x,q);
+  r1 = dist(X,i,idx(1));
+  r2 = dist(X,i,idx(2));
   plin = Y(idx(1),:);
   qlin = Y(idx(2),:);
   % intersecao
@@ -41,12 +37,6 @@ end
 
 % retorna a projecao NNP
 Z = Y;
-
-% plot NNP
-%subplot(1,3,1);
-%plot3(X(:,1),X(:,2),X(:,3),'o');
-%subplot(1,3,2);
-%plot(Y(:,1),Y(:,2),'o');
 
 %--------------%
 % Force Scheme %
@@ -60,7 +50,7 @@ for k = 1:iter % iteracoes
   for i = 1:size(X,1)
     for j = i:size(X,1)
       if (i ~= j)
-        d = dist(i,j); %dist(X(i,:),X(j,:));
+        d = dist(X,i,j);
         if (d > dmax)
           dmax = d;
         end
@@ -83,22 +73,19 @@ for k = 1:iter % iteracoes
       if (i ~= j)
         % calcula a direcao v
         v = qlin-xlin;
-        %delta = (dist(x,q)-dmin) / diff_max_min;
-        delta = (dist(i,j)-dmin) / diff_max_min;
+        % this normalization avoid (under)overflow
+        v = v/hypot(v(1),v(2));
+        delta = (dist(X,i,j)-dmin) / diff_max_min;
         delta = delta - norm(xlin-qlin);
         % move q' = Y(j,:) na direcao de v por uma fracao delta
-        Y(j,:) = qlin + delta/1000 * v;
+        % removed "fraction" of delta
+        Y(j,:) = qlin + delta * v;
       end
     end
   end
 
 end % fim iteracao
 
-% plot Force
-%subplot(1,3,3);
-%plot(Y(:,1),Y(:,2),'o');
-
-function d = dist(i,j)
-  global xx; % euclidiana
-  d = norm(xx(i,:)-xx(j,:)); % euclidiana
+function d = dist(x,i,j)
+  d = norm(x(i,:)-x(j,:)); % euclidiana^2
 
