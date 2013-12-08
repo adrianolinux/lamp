@@ -1,17 +1,17 @@
 clear all;
 x = load('iris.data');
-t = x(:,size(x,2));
-x = x(:,1:size(x,2)-1);
+t = x(:,end);
+x = x(:,1:end-1);
 n = size(x,1);
 
 choice_size = sqrt(n);
 random_choice = randperm(n);
 random_choice = random_choice(1:choice_size);
 xs = x(random_choice,:);
-ty = t(random_choice);
+ts = t(random_choice);
 
 tic
-[ys,z] = force(xs,10);
+ys = force(xs);
 display('Posicionamento dos pontos de controle: ');
 toc
 
@@ -24,11 +24,12 @@ toc
 figure(1);
 clf;
 hold on;
-plot(ys(ty == 1,1), ys(ty == 1,2), 'ro', 'MarkerSize', 15);
-plot(ys(ty == 2,1), ys(ty == 2,2), 'go', 'MarkerSize', 15);
-plot(ys(ty == 3,1), ys(ty == 3,2), 'bo', 'MarkerSize', 15);
-plot(y(t == 1,1), y(t == 1,2), 'r.', ...
-     y(t == 2,1), y(t == 2,2), 'g.', ...
-     y(t == 3,1), y(t == 3,2), 'b.');
+color = [0,0,0; 1,0,0; 0,1,0;, 0,0,1];
+h = scatter(y(:,1), y(:,2), 25, color(t,:), 'filled');
+set(h,'markeredgecolor','k');
+plot(ys(ts == 1,1), ys(ts == 1,2), 'ko', ...
+     ys(ts == 2,1), ys(ts == 2,2), 'ro', ...
+     ys(ts == 3,1), ys(ts == 3,2), 'go', 'markersize', 15);
+legend('Projected data', 'Control points projection');
 hold off;
 
