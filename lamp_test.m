@@ -11,7 +11,8 @@ xs = x(random_choice,:);
 ts = t(random_choice);
 
 tic
-ys = force(xs);
+options.data_type = 'data';
+ys = force(xs, options);
 display('Posicionamento dos pontos de controle: ');
 toc
 

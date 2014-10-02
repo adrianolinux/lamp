@@ -1,48 +1,56 @@
-function Y = force(varargin)
+function Y = force(X,options)
 
 % force.m - Build a 2D projection using Force Scheme.
 %
-% y = force(x,iter,frac);
+% y = force(x,options);
 %
 %   x is a matrix N x D containing the data organized by rows. N is the
 %   number of instances and D is the dimension of the data
-%   iter is the number of iterations (optional, default is 50)
-%   frac is the fraction of delta (optional, default is 8)
+%   OR
+%   x is the distance matrix of the data
+%   options:
+%     options.data_type must be 'data' or 'dmat', indicating that x is the
+%       data matrix or the distance matrix
+%     options.iter is the number of iterations (optional, default is 50)
+%     options.frac is the fraction of delta (optional, default is 8)
 %
 %   y is a matrix N x 2 containing the projected data in R^2.
 
 tol = 1e-6;
 
-switch (nargin)
-  case 1
-    X = varargin{1};
+if ~isfield(options,'data_type')
+    options.data_type = 'data';
+end
+
+if ~isfield(options,'iter')
     iter = 50;
+else
+    iter = options.iter;
+end
+
+if ~isfield(options,'frac')
     fraction = 8;
-  case 2
-    X = varargin{1};
-    iter = varargin{2};
-    fraction = 8;
-  case 3
-    X = varargin{1};
-    iter = varargin{2};
-    fraction = varargin{3};
-  otherwise
-    disp('Force ERROR: wrong number of parameters');
-    return;
+else
+    fraction = options.frac;
 end
 
 N = size(X,1);
 
 % inicializacao
-Y(:,1) = rand(N,1);
-Y(:,2) = rand(N,1);
+Y = rand(N,2);
 
 %--------------%
 % Force Scheme %
 %--------------%
 
 % distancia em R^n
-distRn = dist(X');
+if strcmp(options.data_type,'data')
+    distRn = dist(X');
+elseif strcmp(options.data_type,'dmat')
+    distRn = X;
+else
+	disp('Force ERROR: Undefined data type');
+end
 
 idx = randperm(N);
 
