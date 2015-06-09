@@ -27,7 +27,7 @@ function Y = lamp(X,Xs,Ys)
     for i = 1:k
       % verifica se o ponto a ser projetado eh um ponto de controle
       % evita divisao por zero
-      if Xs(i,:) == X(pto,:)
+      if norm(Xs(i,:)-X(pto,:))
         alpha(i) = realmax('single'); % nao funcionou com realmax('double')
       else
         alpha(i) = 1 / norm( Xs(i,:)-X(pto,:) )^2;
@@ -56,7 +56,7 @@ function Y = lamp(X,Xs,Ys)
       B(i,:) = sqrt(alpha(i))*ychapel(i,:)';
     end
     
-    [U,D,V] = svd(A'*B); % (eq 7)
+    [U,~,V] = svd(A'*B); % (eq 7)
     % VV eh a matriz V completada ate o tamanho de U com zeros
     VV = zeros(d,p); % size(U)=d, pelo SVD
     for i = 1:p % size(V)=p, pelo SVD
